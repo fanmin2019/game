@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>game 1</title>
+        <style media="screen">
+            canvas {
+                border: 1px black solid;
+            }
+        </style>
+    </head>
+    <body>
+        <canvas id="id-canvas" width="400" height="300"></canvas>
+    <script type="text/javascript">
+        var log = console.log.bind("console")
+        var imageFromPath = function(path) {
+            var img = new Image()
+            img.src = path
+            return img
+        }
+        //object
+        //モジュール化することによって、属性とそのメソッドは全部まとまる
+        var Paddle = function(){
+            var image = imageFromPath('panel.PNG')
+            var o = {
+                image: image,
+                x: 100,
+                y: 250,
+                speed: 15, // comma must
+            }
+            o.moveRight = function() {
+                o.x += o.speed
+            }
+
+            o.moveLeft = function() {
+                o.x -= o.speed
+            }
+            
+            o.collide = function (ball) {
+                //paddleの上端より低い
+                if(ball.y + ball.image.height > o.y) {
+                    //paddleの左端より右、かつ、paddleの右端より左
+                    if(ball.x > o.x && ball.x < o.x + o.image.width ){
+                        return true
+                    } else {
+                        return false
+                    }
+                }else {
+                    return false
+                }
+            }
+
+            return o
+        }
+
+        var Min_game = function(){
+            var g = {
+                actions: {},
+                keydowns:{},
+            }
+            //違和感：定義と普通のソースコードが混在
+            var canvas = document.querySelector("#id-canvas")
+            var context = canvas.getContext("2d")
+            g.canvas = canvas
+            g.context = context
+            g.drawImage = function(minImage){
+                 // draw
+                 g.context.drawImage(minImage.image, minImage.x, minImage.y)
+            }
+            //events
+            window.addEventListener('keydown', function(){
+                g.keydowns[event.key] = true
+            })
+
+            window.addEventListener('keyup', function(){
+                g.keydowns[event.key] = false
+            })
+
+            g.registerAction = function(key, callback) {
+                g.actions[key] = callback
+            }
+
+            //timer
+            //intervalおかしい
+            setInterval(function () {
+                var actions = Object.keys(g.actions)
+                for (var i = 0; i < actions.length; i++) {
+                    var key = actions[i]
+                    if(g.keydowns[key]) {
+                        //if key is down, callback
+                        g.actions[key]()
+                    }
+                }
+                //clear
+                context.clearRect(0, 0, canvas.width, canvas.height);
+                //update
+                g.update()
+                //draw
+                g.draw()
+            }, 1000/30);
+
+            return g
+        }
+
+        var Ball = function () {
+           var image = imageFromPath('ball.PNG')
+            var o = {
+                image: image,
+                x: 100,
+                y: 200,
+                speedX: 10, // comma must
+                speedY: 10, // comma must
+                fired: false,
+
+            }
+
+            o.fire = function() {
+                o.fired = true
+            }
+
+            o.move = function() {
+               if(o.fired) {
+                   if(o.x < 0 || o.x > 400) {
+                       o.speedX = o.speedX * -1
+                   }else{
+                       o.speedX = o.speedX * 1
+                   }
+
+                   if(o.y < 0 || o.y > 300) {
+                       o.speedY = o.speedY * -1
+                   }else{
+                       o.speedY = o.speedY * 1
+                   }
+
+                   o.x += o.speedX
+                   o.y += o.speedY
+               }
+            }
+
+            return o
+        }
+
+        // プログラムの入り口は常に一つ
+        // プログラムの基本単位はファンクション
+        var __main = function() {
+            log("main start")
+            // オブジェクトのインスタンスを作る
+            var game =  Min_game()
+            var paddle = Paddle()
+            var ball =  Ball()
+
+            //function化
+             game.registerAction('d', function(){
+                 paddle.moveRight()
+             })
+
+             game.registerAction('a', function(){
+                 paddle.moveLeft()
+             })
+
+            game.registerAction('f', function(){
+                 ball.fire()
+             })
+
+             game.update = function() {
+                ball.move()
+                 //if collide
+                 if(paddle.collide(ball)){
+                     //ballの何かのメソッドを呼ぶべき
+                     ball.speedY *= -1
+                 }
+
+             }
+
+             //定義するのがおかしい、理想形:game.draw(padle)
+            //paddleを渡すために（setInterval)、ここで書かざるを得ない
+             game.draw = function() {
+                 //理想形:game.draw(paddle)
+                 game.drawImage(paddle)
+                 game.drawImage(ball)
+             }
+        }
+
+        __main()
+    </script>
+
+    </body>
+</html>
