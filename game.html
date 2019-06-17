@@ -26,14 +26,35 @@
                 image: image,
                 x: 100,
                 y: 250,
-                speed: 15, // comma must
+                speed: 5, // comma must
             }
+
+            //同じロジックをまとめる
+            o.move = function (x){
+                if(x < 0) {
+                    x = 0
+                } else if(o.x > 400 - o.image.width){
+                    x = 400 - o.image.width
+                }
+                o.x = x
+            }
+
             o.moveRight = function() {
-                o.x += o.speed
+                // if(o.x > 400 - o.image.width) {
+                //     o.x = 400 - o.image.width
+                // } else {
+                //     o.x += o.speed
+                // }
+                o.move(o.x + o.speed)
             }
 
             o.moveLeft = function() {
-                o.x -= o.speed
+                // if(o.x < 0) {
+                //     o.x = 0
+                // } else {
+                //     o.x -= o.speed
+                // }
+                o.move(o.x - o.speed)
             }
             
             o.collide = function (ball) {
@@ -58,7 +79,7 @@
                 actions: {},
                 keydowns:{},
             }
-            //違和感：定義と普通のソースコードが混在
+            //違和感：定義とlogicが混在
             var canvas = document.querySelector("#id-canvas")
             var context = canvas.getContext("2d")
             g.canvas = canvas
@@ -137,6 +158,53 @@
                }
             }
 
+            o.rebound = function () {
+               log("rebound")
+                o.speedY *= -1
+            }
+
+            return o
+        }
+
+        var rectInterSects = function (a, b) {
+            if(!paused) {
+                log("a.y", a.y, "b.y", b.y, "b.y + b.image.height", b.y + b.image.height, a.y > b.y && b.y + b.image.height > a.y)
+                log("a.x", a.x, "b.x", b.x, "b.x + b.image.height", b.x + b.image.width, a.x < b.x && a.x > b.x + b.image.width)
+            }
+
+            if(b.y <= a.y && a.y <= b.y + b.image.height) {
+                    //paddleの左端より右、かつ、paddleの右端より左
+                    if(b.x <=  a.x && a.x <= b.x + b.image.width ){
+                        return true
+                    }
+            }
+            return false
+        }
+        var Block = function () {
+           var image = imageFromPath('block.PNG')
+            var o = {
+                image: image,
+                x: 200,
+                y: 150,
+                width: 50, // comma must
+                height: 20, // comma must
+                alive: true,
+            }
+
+            o.kill = function() {
+                o.alive = false
+            }
+            
+            o.collide = function (ball) {
+               return o.alive && (rectInterSects(o, ball) || rectInterSects(ball, o))
+                // if(rectInterSects(o, ball) || rectInterSects(ball, o)) {
+                //  // if(rectInterSects(o, ball)) {
+                //     return true
+                // } else {
+                //     return false
+                // }
+            }
+
             return o
         }
 
@@ -148,6 +216,15 @@
             var game =  Min_game()
             var paddle = Paddle()
             var ball =  Ball()
+            var blocks = []
+            for (var i = 0; i < 3 ; i++) {
+                var b = Block()
+                b.y = 100
+                b.x = 100 * i + 1
+                blocks.push(b)
+            }
+
+            paused = false
 
             //function化
              game.registerAction('d', function(){
@@ -162,12 +239,34 @@
                  ball.fire()
              })
 
+            // game.registerAction('p', function(){
+            //      paused = !paused
+            //  })
+            window.addEventListener('keyup', function () {
+                if(event.key == 'p') {
+                    paused = !paused
+                }
+            })
+
              game.update = function() {
-                ball.move()
+                if(paused) {
+                   return
+                }
+                 ball.move()
+
                  //if collide
                  if(paddle.collide(ball)){
                      //ballの何かのメソッドを呼ぶべき
-                     ball.speedY *= -1
+                     // ball.speedY *= -1
+                     ball.rebound()
+                 }
+                 for (var i=0; i < blocks.length; i++) {
+                     var block = blocks[i]
+                     if(block.collide(ball)){
+                         //ballの何かのメソッドを呼ぶべき
+                         block.kill()
+                         ball.rebound()
+                     }
                  }
 
              }
@@ -178,6 +277,13 @@
                  //理想形:game.draw(paddle)
                  game.drawImage(paddle)
                  game.drawImage(ball)
+
+                 for (var i=0; i < blocks.length; i++) {
+                     var block = blocks[i]
+                     if(block.alive) {
+                         game.drawImage(block)
+                     }
+                 }
              }
         }
 
