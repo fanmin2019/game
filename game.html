@@ -8,204 +8,27 @@
                 border: 1px black solid;
             }
         </style>
+        <script src="utility.js"></script>
+        <script src="Min_game.js"></script>
+        <script src="Ball.js"></script>
+        <script src="Paddle.js"></script>
+        <script src="Block.js"></script>
+        <script src="level.js"></script>
     </head>
     <body>
         <canvas id="id-canvas" width="400" height="300"></canvas>
     <script type="text/javascript">
-        var log = console.log.bind("console")
-        var imageFromPath = function(path) {
-            var img = new Image()
-            img.src = path
-            return img
-        }
-        //object
-        //モジュール化することによって、属性とそのメソッドは全部まとまる
-        var Paddle = function(){
-            var image = imageFromPath('panel.PNG')
-            var o = {
-                image: image,
-                x: 100,
-                y: 250,
-                speed: 5, // comma must
+        var loadLevel = function (n) {
+            log("loadLevel start")
+            var blocks = []
+            var nowLevel = level[n-1]
+            log("nowLevel", nowLevel)
+            for (var i = 0; i < nowLevel.length ; i++) {
+                var b = Block(nowLevel[i])
+                blocks.push(b)
             }
-
-            //同じロジックをまとめる
-            o.move = function (x){
-                if(x < 0) {
-                    x = 0
-                } else if(o.x > 400 - o.image.width){
-                    x = 400 - o.image.width
-                }
-                o.x = x
-            }
-
-            o.moveRight = function() {
-                // if(o.x > 400 - o.image.width) {
-                //     o.x = 400 - o.image.width
-                // } else {
-                //     o.x += o.speed
-                // }
-                o.move(o.x + o.speed)
-            }
-
-            o.moveLeft = function() {
-                // if(o.x < 0) {
-                //     o.x = 0
-                // } else {
-                //     o.x -= o.speed
-                // }
-                o.move(o.x - o.speed)
-            }
-            
-            o.collide = function (ball) {
-                //paddleの上端より低い
-                if(ball.y + ball.image.height > o.y) {
-                    //paddleの左端より右、かつ、paddleの右端より左
-                    if(ball.x > o.x && ball.x < o.x + o.image.width ){
-                        return true
-                    } else {
-                        return false
-                    }
-                }else {
-                    return false
-                }
-            }
-
-            return o
-        }
-
-        var Min_game = function(){
-            var g = {
-                actions: {},
-                keydowns:{},
-            }
-            //違和感：定義とlogicが混在
-            var canvas = document.querySelector("#id-canvas")
-            var context = canvas.getContext("2d")
-            g.canvas = canvas
-            g.context = context
-            g.drawImage = function(minImage){
-                 // draw
-                 g.context.drawImage(minImage.image, minImage.x, minImage.y)
-            }
-            //events
-            window.addEventListener('keydown', function(){
-                g.keydowns[event.key] = true
-            })
-
-            window.addEventListener('keyup', function(){
-                g.keydowns[event.key] = false
-            })
-
-            g.registerAction = function(key, callback) {
-                g.actions[key] = callback
-            }
-
-            //timer
-            //intervalおかしい
-            setInterval(function () {
-                var actions = Object.keys(g.actions)
-                for (var i = 0; i < actions.length; i++) {
-                    var key = actions[i]
-                    if(g.keydowns[key]) {
-                        //if key is down, callback
-                        g.actions[key]()
-                    }
-                }
-                //clear
-                context.clearRect(0, 0, canvas.width, canvas.height);
-                //update
-                g.update()
-                //draw
-                g.draw()
-            }, 1000/30);
-
-            return g
-        }
-
-        var Ball = function () {
-           var image = imageFromPath('ball.PNG')
-            var o = {
-                image: image,
-                x: 100,
-                y: 200,
-                speedX: 10, // comma must
-                speedY: 10, // comma must
-                fired: false,
-
-            }
-
-            o.fire = function() {
-                o.fired = true
-            }
-
-            o.move = function() {
-               if(o.fired) {
-                   if(o.x < 0 || o.x > 400) {
-                       o.speedX = o.speedX * -1
-                   }else{
-                       o.speedX = o.speedX * 1
-                   }
-
-                   if(o.y < 0 || o.y > 300) {
-                       o.speedY = o.speedY * -1
-                   }else{
-                       o.speedY = o.speedY * 1
-                   }
-
-                   o.x += o.speedX
-                   o.y += o.speedY
-               }
-            }
-
-            o.rebound = function () {
-               log("rebound")
-                o.speedY *= -1
-            }
-
-            return o
-        }
-
-        var rectInterSects = function (a, b) {
-            if(!paused) {
-                log("a.y", a.y, "b.y", b.y, "b.y + b.image.height", b.y + b.image.height, a.y > b.y && b.y + b.image.height > a.y)
-                log("a.x", a.x, "b.x", b.x, "b.x + b.image.height", b.x + b.image.width, a.x < b.x && a.x > b.x + b.image.width)
-            }
-
-            if(b.y <= a.y && a.y <= b.y + b.image.height) {
-                    //paddleの左端より右、かつ、paddleの右端より左
-                    if(b.x <=  a.x && a.x <= b.x + b.image.width ){
-                        return true
-                    }
-            }
-            return false
-        }
-        var Block = function () {
-           var image = imageFromPath('block.PNG')
-            var o = {
-                image: image,
-                x: 200,
-                y: 150,
-                width: 50, // comma must
-                height: 20, // comma must
-                alive: true,
-            }
-
-            o.kill = function() {
-                o.alive = false
-            }
-            
-            o.collide = function (ball) {
-               return o.alive && (rectInterSects(o, ball) || rectInterSects(ball, o))
-                // if(rectInterSects(o, ball) || rectInterSects(ball, o)) {
-                //  // if(rectInterSects(o, ball)) {
-                //     return true
-                // } else {
-                //     return false
-                // }
-            }
-
-            return o
+            log("loadLevel end", blocks)
+            return blocks
         }
 
         // プログラムの入り口は常に一つ
@@ -213,16 +36,17 @@
         var __main = function() {
             log("main start")
             // オブジェクトのインスタンスを作る
-            var game =  Min_game()
+            var game =  Min_game(30)
             var paddle = Paddle()
             var ball =  Ball()
-            var blocks = []
-            for (var i = 0; i < 3 ; i++) {
-                var b = Block()
-                b.y = 100
-                b.x = 100 * i + 1
-                blocks.push(b)
-            }
+            var blocks = loadLevel(2)
+            // for (var i = 0; i < 3 ; i++) {
+            //     var b = Block()
+            //     b.y = 100
+            //     b.x = 100 * i + 1
+            //     blocks.push(b)
+            // }
+
 
             paused = false
 
@@ -243,9 +67,16 @@
             //      paused = !paused
             //  })
             window.addEventListener('keyup', function () {
-                if(event.key == 'p') {
+                var k = event.key
+                if(k == 'p') {
                     paused = !paused
-                }
+                }else if ('1234567'.includes(k)) {
+                    blocks = loadLevel(Number(k))
+                // } else if (event.key == '2') {
+                //     blocks = loadLevel(2)
+                // } else if (event.key == '3') {
+                //     blocks = loadLevel(3)
+                 }
             })
 
              game.update = function() {
