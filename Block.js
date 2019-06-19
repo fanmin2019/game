@@ -11,10 +11,14 @@ var Block = function (position) {
         width: 50, // comma must
         height: 20, // comma must
         alive: true,
+        lives: p[2] || 1,
     }
 
     o.kill = function() {
-        o.alive = false
+        o.lives--
+        if(o.lives < 1) {
+            o.alive = false
+        }
     }
 
     o.collide = function (ball) {
