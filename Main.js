@@ -1,17 +1,17 @@
-var loadLevel = function (n) {
-    log("loadLevel start")
+var loadLevel = function (game, n) {
+    // log("loadLevel start")
     var blocks = []
     var nowLevel = level[n-1]
     log("nowLevel", nowLevel)
     for (var i = 0; i < nowLevel.length ; i++) {
-        var b = Block(nowLevel[i])
+        var b = Block(game, nowLevel[i])
         blocks.push(b)
     }
     log("loadLevel end", blocks)
     return blocks
 }
 
-var enableDebugMode = function (enabled) {
+var enableDebugMode = function (game, enabled) {
     if(!enabled) {
         return
     }
@@ -28,7 +28,7 @@ var enableDebugMode = function (enabled) {
             paused = !paused
         }else if ('1234567'.includes(k)) {
             //デバッグのため
-            blocks = loadLevel(Number(k))
+            blocks = loadLevel(game, Number(k))
         }
     })
     var c = document.getElementById("id-canvas")
@@ -41,77 +41,89 @@ var enableDebugMode = function (enabled) {
 }
 // プログラムの入り口は常に一つ
 // プログラムの基本単位はファンクション
+
 var __main = function() {
     log("main start")
     // オブジェクトのインスタンスを作る
-    var game =  Min_game(30)
-    var paddle = Paddle()
-    var ball =  Ball()
-    var score = 0
-    //結局グローバル変数にしないといけない
-    blocks = loadLevel(2)
+    var images = {
+        'block': 'block.png',
+        'paddle': 'panel.png',
+        'ball': 'ball.png',
+    }
 
-    paused = false
-    //function化
-    game.registerAction('d', function(){
-        paddle.moveRight()
-    })
 
-    game.registerAction('a', function(){
-        paddle.moveLeft()
-    })
+    //オブジェクト化されていないため、いろんなところにgameが必要。。。
+    var game =  Min_game(30, images, function (game) {
+        var paddle = Paddle(game)
+        var ball =  Ball(game)
+        var score = 0
+        //結局グローバル変数にしないといけない
+        //同じ図なので、何回もロードする必要がない
+        blocks = loadLevel(game,1)
 
-    game.registerAction('f', function(){
-        ball.fire()
-    })
+        paused = false
+        //function化
+        game.registerAction('d', function(){
+            paddle.moveRight()
+        })
 
-    // game.registerAction('p', function(){
-    //      paused = !paused
-    //  })
-    enableDebugMode(true)
-    game.update = function() {
-        if(paused) {
-            return
-        }
-        ball.move()
+        game.registerAction('a', function(){
+            paddle.moveLeft()
+        })
 
-        //if collide
-        if(paddle.collide(ball)){
-            //ballの何かのメソッドを呼ぶべき
-            // ball.speedY *= -1
-            ball.rebound()
-        }
-        for (var i=0; i < blocks.length; i++) {
-            var block = blocks[i]
-            if(block.collide(ball)){
+        game.registerAction('f', function(){
+            ball.fire()
+        })
+
+        // game.registerAction('p', function(){
+        //      paused = !paused
+        //  })
+        //gameがロードされたタイミングでデバッグモードを呼び出す
+        enableDebugMode(game,true)
+        game.update = function() {
+            if(paused) {
+                return
+            }
+            ball.move()
+
+            //if collide
+            if(paddle.collide(ball)){
                 //ballの何かのメソッドを呼ぶべき
-                block.kill()
-                score += 100
+                // ball.speedY *= -1
                 ball.rebound()
             }
-        }
-
-    }
-
-    //game.drawは実際に常にrun loopの中で呼ばれているが、
-    // このメインの中だけだと、わかりにくい
-    //定義するのがおかしい、理想形:game.draw(padle)
-    //paddleを渡すために（setInterval)、ここで書かざるを得ない
-    game.draw = function() {
-        //理想形:game.draw(paddle)
-        game.drawImage(paddle)
-        game.drawImage(ball)
-
-        for (var i=0; i < blocks.length; i++) {
-            var block = blocks[i]
-            if(block.alive) {
-                game.drawImage(block)
+            for (var i=0; i < blocks.length; i++) {
+                var block = blocks[i]
+                if(block.collide(ball)){
+                    //ballの何かのメソッドを呼ぶべき
+                    block.kill()
+                    score += 100
+                    ball.rebound()
+                }
             }
+
         }
 
-        //fill text
-        game.context.fillText("Score:" + score, 10, 290);
-    }
+        //game.drawは実際に常にrun loopの中で呼ばれているが、
+        // このメインの中だけだと、わかりにくい
+        //定義するのがおかしい、理想形:game.draw(padle)
+        //paddleを渡すために（setInterval)、ここで書かざるを得ない
+        game.draw = function() {
+            //理想形:game.draw(paddle)
+            game.drawImage(paddle)
+            game.drawImage(ball)
+
+            for (var i=0; i < blocks.length; i++) {
+                var block = blocks[i]
+                if(block.alive) {
+                    game.drawImage(block)
+                }
+            }
+
+            //fill text
+            game.context.fillText("Score:" + score, 10, 290);
+        }
+    })
 }
 
 __main()

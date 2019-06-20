@@ -1,9 +1,19 @@
-var Block = function (position) {
+var Block = function (game, position) {
     log("position", position)
     //position[x,y]
     var p = position
     //imageFromPathはどこから来たか、わからなくなる
-    var image = imageFromPath('block.PNG')
+    // var image = imageFromPath('block.PNG')
+    var o = game.imageByName('block')
+    o.x = p[0]
+    o.y = p[1]
+    o.fired = false
+    o.width  = 50
+    o.height = 20
+    o.alive = true
+    o.lives = p[2] || 1
+
+    /*
     var o = {
         image: image,
         x: p[0],
@@ -13,6 +23,7 @@ var Block = function (position) {
         alive: true,
         lives: p[2] || 1,
     }
+*/
 
     o.kill = function() {
         o.lives--
@@ -22,7 +33,7 @@ var Block = function (position) {
     }
 
     o.collide = function (ball) {
-       return o.alive && (rectInterSects(o, ball) || rectInterSects(ball, o))
+        return o.alive && (rectInterSects(o, ball) || rectInterSects(ball, o))
         // if(rectInterSects(o, ball) || rectInterSects(ball, o)) {
         //  // if(rectInterSects(o, ball)) {
         //     return true
@@ -31,5 +42,5 @@ var Block = function (position) {
         // }
     }
 
-            return o
-        }
+    return o
+}

@@ -4,6 +4,7 @@ var imageFromPath = function(path) {
     img.src = path
     return img
 }
+
 var rectInterSects = function (a, b) {
     if(!paused) {
         log("a.y", a.y, "b.y", b.y, "b.y + b.image.height", b.y + b.image.height, a.y > b.y && b.y + b.image.height > a.y)
