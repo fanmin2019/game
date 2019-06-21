@@ -16,11 +16,11 @@ var enableDebugMode = function (game, enabled) {
         return
     }
     var range = document.getElementById("id-input-speed")
-    range.addEventListener("input", function () {
+    range.addEventListener("input", function (event) {
         // log(event.target.value, event)
         window.fps = Number(event.target.value)
     })
-    window.addEventListener('keyup', function () {
+    window.addEventListener('keyup', function (event) {
         var k = event.key
         log("key is ", k)
         if(k == 'p') {
@@ -31,13 +31,31 @@ var enableDebugMode = function (game, enabled) {
             blocks = loadLevel(game, Number(k))
         }
     })
-    var c = document.getElementById("id-canvas")
-    c.addEventListener('click', function () {
-        var rect = event.target.getBoundingClientRect();
-        var xx = event.clientX - rect.left;
-        var yy = event.clientY - rect.top;
-        log("x", xx, "y", yy)
+    // var c = document.getElementById("id-canvas")
+    // c.addEventListener('click', function () {
+    //     var rect = event.target.getBoundingClientRect();
+    //     var xx = event.clientX - rect.left;
+    //     var yy = event.clientY - rect.top;
+    //     log("x", xx, "y", yy)
+    // })
+    game.canvas.addEventListener('mousedown', function (event) {
+        // log(evt)
+        var x = event.offsetX
+        var y = event.offsetY
+        log("mousedown", x, y)
     })
+    game.canvas.addEventListener('mousemove', function (event) {
+        var x = event.offsetX
+        var y = event.offsetY
+        log("mousedown", x, y)
+    })
+
+    game.canvas.addEventListener('mouseup', function (event) {
+        var x = event.offsetX
+        var y = event.offsetY
+        log("mousedown", x, y)
+    })
+
 }
 // プログラムの入り口は常に一つ
 // プログラムの基本単位はファンクション
@@ -109,6 +127,10 @@ var __main = function() {
         //定義するのがおかしい、理想形:game.draw(padle)
         //paddleを渡すために（setInterval)、ここで書かざるを得ない
         game.draw = function() {
+            //fill rect color
+            game.context.fillStyle = "#443"
+            game.context.fillRect(0, 0, 400, 300);
+
             //理想形:game.draw(paddle)
             game.drawImage(paddle)
             game.drawImage(ball)

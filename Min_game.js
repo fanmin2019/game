@@ -15,11 +15,11 @@ var Min_game = function(fps, images, runCallback){
         g.context.drawImage(minImage.image, minImage.x, minImage.y)
     }
     //events
-    window.addEventListener('keydown', function(){
+    window.addEventListener('keydown', function(event){
         g.keydowns[event.key] = true
     })
 
-    window.addEventListener('keyup', function(){
+    window.addEventListener('keyup', function(event){
         g.keydowns[event.key] = false
     })
 
