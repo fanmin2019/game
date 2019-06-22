@@ -11,7 +11,7 @@ var loadLevel = function (game, n) {
     return blocks
 }
 
-var enableDebugMode = function (game, enabled) {
+var enableDebugMode = function (game, enabled, ball) {
     if(!enabled) {
         return
     }
@@ -38,22 +38,34 @@ var enableDebugMode = function (game, enabled) {
     //     var yy = event.clientY - rect.top;
     //     log("x", xx, "y", yy)
     // })
+    var enableDrag;
     game.canvas.addEventListener('mousedown', function (event) {
         // log(evt)
         var x = event.offsetX
         var y = event.offsetY
-        log("mousedown", x, y)
+        // log("mousedown", x, y)
+        //is ball clicked?
+        if(ball.hasPoint(x, y)) {
+            enableDrag = true
+        }
+
     })
     game.canvas.addEventListener('mousemove', function (event) {
         var x = event.offsetX
         var y = event.offsetY
-        log("mousedown", x, y)
+        // log("mousedown", x, y)
+        if(enableDrag) {
+            ball.x = x
+            ball.y = y
+        }
+
     })
 
     game.canvas.addEventListener('mouseup', function (event) {
         var x = event.offsetX
         var y = event.offsetY
         log("mousedown", x, y)
+        enableDrag = false
     })
 
 }
@@ -97,7 +109,7 @@ var __main = function() {
         //      paused = !paused
         //  })
         //gameがロードされたタイミングでデバッグモードを呼び出す
-        enableDebugMode(game,true)
+        enableDebugMode(game,true, ball)
         game.update = function() {
             if(paused) {
                 return
