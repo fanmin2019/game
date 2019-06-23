@@ -4,6 +4,7 @@ var Min_game = function(fps, images, runCallback){
         actions: {},
         keydowns:{},
         images:{},
+        scence: null,
     }
     //違和感：定義とlogicが混在
     var canvas = document.querySelector("#id-canvas")
@@ -25,6 +26,14 @@ var Min_game = function(fps, images, runCallback){
 
     g.registerAction = function(key, callback) {
         g.actions[key] = callback
+    }
+
+    g.update = function() {
+        g.scence.update()
+    }
+
+    g.draw = function() {
+        g.scence.draw()
     }
 
     window.fps = 30
@@ -50,6 +59,7 @@ var Min_game = function(fps, images, runCallback){
         }, 1000/window.fps);
     }
 
+    //図のロードが終わったら、ゲームを開始
     var counts = []
     var keyList = Object.keys(images)
     log("keyList", keyList)
@@ -65,7 +75,7 @@ var Min_game = function(fps, images, runCallback){
             if(counts.length == keyList.length){
                 //game start
                 runCallback(g)
-                g.run()
+                g.__start()
             }
         }
 
@@ -85,7 +95,8 @@ var Min_game = function(fps, images, runCallback){
 
 
 
-    g.run = function() {
+    g.runWithScene = function(scene) {
+        g.scence = scene
         //timer
         //intervalおかしい
         setTimeout(function () {
@@ -93,5 +104,12 @@ var Min_game = function(fps, images, runCallback){
         }, 1000/window.fps);
     }
 
+    g.__start = function () {
+        runCallback(g)
+    }
+
+    g.replaceScene = function (scene) {
+        g.scence = scene
+    }
     return g
 }
