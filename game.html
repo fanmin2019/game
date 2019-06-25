@@ -1,28 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <title>game 1</title>
-        <style media="screen">
-            canvas {
-                border: 1px black solid;
-            }
-        </style>
-        <script src="utility.js"></script>
-        <script src="Min_game.js"></script>
-        <script src="Ball.js"></script>
-        <script src="Paddle.js"></script>
-        <script src="Block.js"></script>
-        <script src="level.js"></script>
-        <script src="scene.js"></script>
-        <script src="scene_end.js"></script>
-    </head>
-    <body>
-        <canvas id="id-canvas" width="400" height="300"></canvas>
-        <hr>
-        <label for="id-input-speed"></label><input type="range" name="" id="id-input-speed" value="1">
-    <script src="Main.js">
-    </script>
+<head>
+    <meta charset="utf-8">
+    <title>game 1</title>
+    <style media="screen">
+        canvas {
+            border: 1px black solid;
+        }
+    </style>
+    <!--game-->
+    <script src="min_game/utility.js"></script>
+    <script src="min_game/Min_game.js"></script>
+    <script src="min_game/Min_scene.js"></script>
+    <!-- scene file -->
+    <script src="scene/main/Ball.js"></script>
+    <script src="scene/main/Paddle.js"></script>
+    <script src="scene/main/Block.js"></script>
+    <script src="scene/main/scene.js"></script>
+    <!-- scence title/end -->
+    <script src="scene/title/scene_title.js"></script>
+    <script src="scene/end/scene_end.js"></script>
+    <!--level-->
+    <script src="scene/editor/scence_editor.js"></script>
+    <script src="level.js"></script>
+</head>
+<body>
+<canvas id="id-canvas" width="400" height="300"></canvas>
+<hr>
+<label for="id-input-speed"></label><input type="range" name="" id="id-input-speed" value="1">
+<script src="Main.js">
+</script>
 
-    </body>
+</body>
 </html>

@@ -1,3 +1,6 @@
+//Sceneの中で、あるいはこのゲームのソースコードの中で、
+// 重複しているコードが多すぎる。
+// それを解決するためにはオブジェクト志向を使う
 var Scene = function (game) {
     var s = {
         game: game,
@@ -5,22 +8,22 @@ var Scene = function (game) {
 
     //initialize
     var paddle = Paddle(game)
-    var ball =  Ball(game)
+    var ball = Ball(game)
     var score = 0
-    blocks = loadLevel(game,1)
+    blocks = loadLevel(game, 1)
 
 
     paused = false
     //function化
-    game.registerAction('d', function(){
+    game.registerAction('d', function () {
         paddle.moveRight()
     })
 
-    game.registerAction('a', function(){
+    game.registerAction('a', function () {
         paddle.moveLeft()
     })
 
-    game.registerAction('f', function(){
+    game.registerAction('f', function () {
         ball.fire()
     })
 
@@ -34,9 +37,9 @@ var Scene = function (game) {
         game.drawImage(paddle)
         game.drawImage(ball)
 
-        for (var i=0; i < blocks.length; i++) {
+        for (var i = 0; i < blocks.length; i++) {
             var block = blocks[i]
-            if(block.alive) {
+            if (block.alive) {
                 game.drawImage(block)
             }
         }
@@ -47,11 +50,11 @@ var Scene = function (game) {
     }
 
     s.update = function () {
-        if(paused) {
+        if (paused) {
             return
         }
         log("ball.y", ball.y, "paddle.y", paddle.y)
-        if(ball.y > paddle.y) {
+        if (ball.y > paddle.y) {
             var end = SceneEnd(game)
             //時にはGAME、時にはG、ややこしい
             game.replaceScene(end)
@@ -59,14 +62,14 @@ var Scene = function (game) {
         }
         ball.move()
         //if collide
-        if(paddle.collide(ball)){
+        if (paddle.collide(ball)) {
             //ballの何かのメソッドを呼ぶべき
             // ball.speedY *= -1
             ball.rebound()
         }
-        for (var i=0; i < blocks.length; i++) {
+        for (var i = 0; i < blocks.length; i++) {
             var block = blocks[i]
-            if(block.collide(ball)){
+            if (block.collide(ball)) {
                 //ballの何かのメソッドを呼ぶべき
                 block.kill()
                 score += 100
@@ -83,7 +86,7 @@ var Scene = function (game) {
         var y = event.offsetY
         // log("mousedown", x, y)
         //is ball clicked?
-        if(ball.hasPoint(x, y)) {
+        if (ball.hasPoint(x, y)) {
             enableDrag = true
         }
 
@@ -92,7 +95,7 @@ var Scene = function (game) {
         var x = event.offsetX
         var y = event.offsetY
         // log("mousedown", x, y)
-        if(enableDrag) {
+        if (enableDrag) {
             ball.x = x
             ball.y = y
         }

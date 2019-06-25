@@ -1,13 +1,12 @@
-var SceneEnd = function (game) {
+var SceneEditor = function (game) {
     var s = {
         game: game,
     }
 
 
-
     s.draw = function () {
         //fill text
-        game.context.fillText("Game Over", 100, 200);
+        game.context.fillText("Level Editor", 100, 200);
 
     }
 

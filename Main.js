@@ -76,9 +76,9 @@ var __main = function() {
     log("main start")
     // オブジェクトのインスタンスを作る
     var images = {
-        'block': 'block.png',
-        'paddle': 'panel.png',
-        'ball': 'ball.png',
+        'block': 'img/block.png',
+        'paddle': 'img/panel.png',
+        'ball': 'img/ball.png',
     }
 
 
@@ -91,7 +91,7 @@ var __main = function() {
     //オブジェクト化されていないため、いろんなところにgameが必要。。。
     var game =  Min_game(30, images, function (g) {
         // log("game22", g)
-        var s = Scene(g)
+        var s = new SceneTitle(g)
         game.runWithScene(s)
     })
     // var game =  Min_game(30, images, function (game) {
