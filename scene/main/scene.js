@@ -55,7 +55,7 @@ var Scene = function (game) {
         }
         log("ball.y", ball.y, "paddle.y", paddle.y)
         if (ball.y > paddle.y) {
-            var end = SceneEnd(game)
+            var end = SceneEnd.new(game)
             //時にはGAME、時にはG、ややこしい
             game.replaceScene(end)
             return

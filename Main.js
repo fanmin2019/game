@@ -91,7 +91,7 @@ var __main = function() {
     //オブジェクト化されていないため、いろんなところにgameが必要。。。
     var game =  Min_game(30, images, function (g) {
         // log("game22", g)
-        var s = new SceneTitle(g)
+        var s = SceneTitle.new(g)
         game.runWithScene(s)
     })
     // var game =  Min_game(30, images, function (game) {
