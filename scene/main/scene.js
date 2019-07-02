@@ -31,6 +31,7 @@ var Scene = function (game) {
     s.draw = function () {
         //fill rect color
         game.context.fillStyle = "#443"
+        game.context.fillStyle = "#443"
         game.context.fillRect(0, 0, 400, 300);
 
         //理想形:game.draw(paddle)
@@ -45,7 +46,8 @@ var Scene = function (game) {
         }
 
         //fill text
-        game.context.fillText("Score:" + score, 10, 290);
+        game.context.fillStyle = "white";
+        game.context.fillText("Score:" + score, 10, 20);
 
     }
 

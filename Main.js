@@ -3,10 +3,13 @@ var loadLevel = function (game, n) {
     var blocks = []
     var nowLevel = level[n-1]
     log("nowLevel", nowLevel)
-    for (var i = 0; i < nowLevel.length ; i++) {
+    for(var i in nowLevel) {
         var b = Block(game, nowLevel[i])
         blocks.push(b)
     }
+    // for (var i = 0; i < nowLevel.length ; i++) {
+    //
+    // }
     log("loadLevel end", blocks)
     return blocks
 }
@@ -25,7 +28,7 @@ var enableDebugMode = function (game, enabled, ball) {
         log("key is ", k)
         if(k == 'p') {
             //一時停止
-            paused = !paused
+            window.paused = !window.paused
         }else if ('1234567'.includes(k)) {
             //デバッグのため
             blocks = loadLevel(game, Number(k))
@@ -89,10 +92,11 @@ var __main = function() {
     //ゲーム開始したら、コールバックを実行
     //コールバックの中で、まずはシーンの初期化とシーンを使った画面描画を始める
     //オブジェクト化されていないため、いろんなところにgameが必要。。。
-    var game =  Min_game(30, images, function (g) {
+    var game =  MinGame.instance(30, images, function (g) {
         // log("game22", g)
         var s = SceneTitle.new(g)
         game.runWithScene(s)
+        window.paused = false
     })
     // var game =  Min_game(30, images, function (game) {
         //ロジックが近いコードについては移動して、まとめて抽象化すべき

@@ -1,5 +1,6 @@
 var Block = function (game, position) {
-    log("position", position)
+    log("new block created  ")
+    // log("position", position)
     //position[x,y]
     var p = position
     //imageFromPathはどこから来たか、わからなくなる
@@ -40,6 +41,12 @@ var Block = function (game, position) {
         // } else {
         //     return false
         // }
+
+    }
+    o.hasPoint = function (x, y) {
+        var xIn = o.x <= x &&  x <= o.x + o.w
+        var yIn = o.y <= y &&  y <= o.y + o.h
+        return xIn && yIn
     }
 
     return o

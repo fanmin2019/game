@@ -1,115 +1,130 @@
-var Min_game = function(fps, images, runCallback){
-    //images is dictionary, image name : image path
-    var g = {
-        actions: {},
-        keydowns:{},
-        images:{},
-        scence: null,
-    }
-    //違和感：定義とlogicが混在
-    var canvas = document.querySelector("#id-canvas")
-    var context = canvas.getContext("2d")
-    g.canvas = canvas
-    g.context = context
-    g.drawImage = function(minImage){
-        // draw
-        g.context.drawImage(minImage.image, minImage.x, minImage.y)
-    }
-    //events
-    window.addEventListener('keydown', function(event){
-        g.keydowns[event.key] = true
-    })
+//まだまだ大きい、もっと小さく分割する必要がある
+class MinGame {
+    constructor(fps, images, runCallback) {
+        window.fps = fps
+        this.images = images
+        this.runCallback = runCallback
+        this.actions =  {}
+        this.keydowns = {}
+        this.scence = null
+        this.canvas = document.querySelector("#id-canvas")
+        this.context = this.canvas.getContext("2d")
+        var self = this
+        //events
+        window.addEventListener('keydown', function(event){
+            //ここでもしthisを使ってしまうと、thisがwindowになってるはず
+            self.keydowns[event.key] = true
+        })
 
-    window.addEventListener('keyup', function(event){
-        g.keydowns[event.key] = false
-    })
+        window.addEventListener('keyup', event => {
+            this.keydowns[event.key] = false
+        })
 
-    g.registerAction = function(key, callback) {
-        g.actions[key] = callback
+        this.init()
     }
 
-    g.update = function() {
-        g.scence.update()
+    static instance(...args) {
+        this.i = this.i || new this(...args)
+        return this.i
     }
 
-    g.draw = function() {
-        g.scence.draw()
+    drawImage(minImg) {
+        this.context.drawImage(minImg.image, minImg.x, minImg.y)
     }
 
-    window.fps = 30
-    var runloop = function() {
-        var actions = Object.keys(g.actions)
+    registerAction = (key, callback) => {
+        this.actions[key] = callback
+    }
+
+    // arrow関数を使わないと、thisがwindowになってしまう
+    update = ()  => {
+        this.scence.update()
+    }
+
+    draw = () => {
+        this.scence.draw()
+    }
+
+    runloop = () => {
+        var actions = Object.keys(this.actions)
         for (var i = 0; i < actions.length; i++) {
             var key = actions[i]
-            if(g.keydowns[key]) {
+            if(this.keydowns[key]) {
                 //if key is down, callback
-                g.actions[key]()
+                this.actions[key]()
             }
         }
         //clear
-        context.clearRect(0, 0, canvas.width, canvas.height);
+        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
         //update
-        g.update()
+        this.update()
         //draw
-        g.draw()
+        this.draw()
         //timer
         //intervalおかしい
-        setTimeout(function () {
-            runloop()
+        var self = this
+        setTimeout( () => {
+            this.runloop()
         }, 1000/window.fps);
     }
 
-    //図のロードが終わったら、ゲームを開始
-    var counts = []
-    var keyList = Object.keys(images)
-    log("keyList", keyList)
-    for (var i = 0; i < keyList.length; i++) {
-        //varを使うと、onloadのcallback関数内は常に一つ目のimgになってしまう
-        let img = new Image()
-        let name = keyList[i]
-        img.src = images[name]
-        log("img.src", img.src, img)
-        img.onload = function () {
-            g.images[name] = img
-            counts.push(img)
-            if(counts.length == keyList.length){
-                //game start
-                runCallback(g)
-                g.__start()
+    init = () => {
+        //図のロードが終わったら、ゲームを開始
+        var counts = []
+        var g = this
+        var keyList = Object.keys(g.images)
+        log("keyList", keyList)
+        for (var i = 0; i < keyList.length; i++) {
+            //varを使うと、onloadのcallback関数内は常に一つ目のimgになってしまう
+            let img = new Image()
+            let name = keyList[i]
+            img.src = g.images[name]
+            log("img.src", img.src, img)
+            img.onload = function () {
+                g.images[name] = img
+                counts.push(img)
+                if (counts.length == keyList.length) {
+                    //game start
+                    g.runCallback(g)
+                    g.__start()
+                }
             }
         }
-
     }
 
-    g.imageByName = function (name) {
-        var o = g.images[name]
-        log("g.images[name]", g.images[name], "name", name, "g.images", g.images)
-        //今後長さと高さを取りやすくするため
-        var image = {
-            w: o.width,
-            h: o.height,
-            image: o,
+        imageByName =  (name) => {
+            var o = this.images[name]
+            // log("g.images[name]", g.images[name], "name", name, "g.images", g.images)
+            //今後長さと高さを取りやすくするため
+            var image = {
+                w: o.width,
+                h: o.height,
+                image: o,
+            }
+            return image
         }
-        return image
-    }
 
 
 
-    g.runWithScene = function(scene) {
-        g.scence = scene
-        //timer
-        //intervalおかしい
-        setTimeout(function () {
-            runloop()
-        }, 1000/window.fps);
-    }
+        runWithScene = (scene) => {
+            this.scence = scene
+            //timer
+            //intervalおかしい
+            var self = this
+            setTimeout(function () {
+                self.runloop()
+            }, 1000/window.fps);
+        }
 
-    g.__start = function () {
-        runCallback(g)
-    }
+        __start = () => {
+            this.runCallback(this)
+        }
 
-    g.replaceScene = function (scene) {
-        g.scence = scene
-    }
-    return g
+        replaceScene = (scene) => {
+            this.scence = scene
+        }
+
+
+
+
 }

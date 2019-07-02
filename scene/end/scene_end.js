@@ -40,6 +40,7 @@ class SceneEnd extends MinScene {
     //override
     draw() {
         //fill text
+        this.game.context.fillStyle = "black";
         this.game.context.fillText("Game Over! Please press r to restart game", 100, 100);
 
     }
