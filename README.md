@@ -1,9 +1,9 @@
-# js_game
-- 使用ECMAScript6标准下的原生JS开发
-- 配有debug和关卡编辑器功能，方便开发者和游戏设计师完善游戏
+# Shoot block game
+- Use original JavaScript under the ECMAScript6 standard
+- With simple debugger and level editor, to make it easy for developers and game designers to improve the game
 
-- 正常使用
+- Game mode
 ![alt](https://s3.gifyu.com/images/game1.gif)
 
-- 关卡编辑
+- Level edit mode
 ![alt](https://s3.gifyu.com/images/level-editor.gif)
